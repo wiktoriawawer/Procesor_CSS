@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <iostream>
 using namespace std;
-//dodac push pull itp 
+
 class Element {
 public:
     char* text; 
@@ -38,9 +38,7 @@ class ListElements {
             if (element->text == text) {
                 cout << "znaleziono " << text;
             }
-            element = element->next;
         }
-        cout << " nie znaleziono " << text;
     }
     int GetListLen() {
 
