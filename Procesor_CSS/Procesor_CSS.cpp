@@ -22,6 +22,7 @@ public:
     ListElements() {
         firstnode = NULL;
     }
+    
     void Push(char* text) {
         if (firstnode == NULL) {
             firstnode = new Element(text);
@@ -80,10 +81,11 @@ public:
         int i = 1;
         Element* element = firstnode;
         while (element != NULL) {
-            cout << i << "  - " << element->text << endl;
+            cout << "  " <<i << " -" << element->text;
             i++;
             element = element->next;
         }
+        cout << endl;
     }
 };
 
@@ -94,10 +96,11 @@ public:
     ListElements* atrybutsvalue;
     Block() {
         selectors= NULL;
-
     }
-    Block(ListElements* a) {
-        selectors = a;
+    Block(ListElements a, ListElements b, ListElements c) {
+        selectors = new ListElements(a);
+        atrybuts = new ListElements(b);
+        atrybutsvalue = new ListElements(c);
     }
 }; 
 class Section {
@@ -111,6 +114,19 @@ public:
         prev = NULL;
         next = NULL;
     }
+    Section(Block block) {
+        counter = 1;
+        prev = NULL;
+        next = NULL;
+        blocks[counter - 1] = block;
+    }
+    Section(Block block,Section* prev) {
+        counter = 1;
+        prev = prev;
+        next = NULL;
+        blocks[counter - 1] = block;
+    }
+
     void Push(Block block) {
         counter++;
         int i = counter - 1;
@@ -118,28 +134,59 @@ public:
     }
 };
 class ListSection {
+public:
     Section* firstnode;
+    ListSection() {
+        firstnode = NULL;
+    }
     void Push(Block block) {
+        if (firstnode == NULL) {
+            firstnode = new Section( block);
+            return;
+        }
         Section* section =firstnode;
+        while (section->next != NULL) {
+            section = section->next;
+        }
+        if (section->counter < T) {
+            section->Push(block);
+            return;
+        }else {
+            section->next = new Section(block, section);
+        }
+            
+            
+    }
+    void Push(Block* block) {
+        Section* section = firstnode;
         while (section->counter != T) {
             section = section->next;
         }
-        section->Push(block);
-            
+        section->Push(*block);
+
+    }
+    void Wypisz() {
+        Section* current = firstnode;
+        int j = 1;
+        while (current != NULL) {
+            cout <<"    "<< j << " wezel" << endl;
+            for (int i = 0; i < firstnode->counter; i++) {
+                cout <<"   "<< i + 1 << " blok" << endl;
+                firstnode->blocks[i].selectors->Write();
+                firstnode->blocks[i].atrybuts->Write();
+                firstnode->blocks[i].atrybutsvalue->Write();
+            }
+            j++;
+            current = current->next;
+        }
+        
+        
     }
 };
-void Rereading(int &i,char** dane,char* text ) {
-    *dane = (char*)malloc(sizeof(char) * (i));
-    for (int j = 0; j < i; j++) {
-        *dane[j] = text[j];
-    }
-    *dane[i - 1] = '\0';
-    i = 0;
-}
-
 int main()
 {
-    
+    ListSection listaglowna1;
+
     ListElements atrybuts;
     ListElements atrybutsvalue;
     ListElements selectors;
@@ -157,25 +204,24 @@ int main()
     
     while (read) {
         x=getchar();
-        //cin >> x;
         if (i == 0 && x == ' ')continue;
+        if (x == '\n' ||x=='\t') continue;     
         if (x == '@') {
-            cout << "-------selektory:" << endl;
+            listaglowna1.Wypisz();
             selectors.Write();
-            cout << "-------atr:" << endl;
             atrybuts.Write();
-            cout << "-------atryval:" << endl;
-            atrybutsvalue.Write();
-            continue;
         }
-        if (x == '\n' ||x=='\t') continue;
-        
         text[i] = x;
         i++;
         if (readselectors) {
             if (x == ',') {
-                Rereading(i, &dane, text);
+                dane = (char*)malloc(sizeof(char) * (i));
+                for (int j = 0; j < i; j++) {
+                    dane[j] = text[j];
+                }
+                dane[i - 1] = '\0';
                 selectors.Push(dane);
+                i = 0;            
                 
             }if (x == '{') {
                 dane = (char*)malloc(sizeof(char) * (i));
@@ -187,49 +233,63 @@ int main()
                 i = 0;
                 readselectors = false;
                 readatributs = true;
+                readartibutsvalue = false;
                 continue;
             }
         
-        }else{
-            if (x == ':' &&  readatributs) {
+        }
+        else if (x == ':' && readatributs) {
+            dane = (char*)malloc(sizeof(char) * (i));
+            for (int j = 0; j < i; j++) {
+                dane[j] = text[j];
+            }
+            dane[i - 1] = '\0';
+            atrybuts.Push(dane);
+            i = 0;
+            readartibutsvalue = true;
+            readatributs = false;
+            readselectors = false;
+        
+        }else {
+
+            if (x == ';') {
                 dane = (char*)malloc(sizeof(char) * (i));
                 for (int j = 0; j < i; j++) {
                     dane[j] = text[j];
                 }
                 dane[i - 1] = '\0';
-                atrybuts.Push(dane);
+                atrybutsvalue.Push(dane);
                 i = 0;
-            }
-            else {
-                if (x == ';') {
+                readatributs = true;
+                readartibutsvalue = false;
+                readselectors = false;
+            }if (x == '}'){
+                if (i >1) {
                     dane = (char*)malloc(sizeof(char) * (i));
                     for (int j = 0; j < i; j++) {
                         dane[j] = text[j];
                     }
                     dane[i - 1] = '\0';
                     atrybutsvalue.Push(dane);
-                    i = 0;
-                    readatributs == true;
-                }if (x == '}'){
-                    if (i >1) {
-                        dane = (char*)malloc(sizeof(char) * (i));
-                        for (int j = 0; j < i; j++) {
-                            dane[j] = text[j];
-                        }
-                        dane[i - 1] = '\0';
-                        atrybutsvalue.Push(dane);
-                        i = 0;
-                    }                    
-                    readselectors == true;
                     
-                }
+                } 
+                i = 0;
+                readselectors = true;
+                readartibutsvalue = false;
+                readatributs = false;
+                Block nowyblock((ListElements) selectors, (ListElements) atrybuts, (ListElements) atrybutsvalue);
+                listaglowna1.Push(nowyblock);
+                listaglowna1.Wypisz();
+                selectors.firstnode = NULL;
+                atrybuts.firstnode = NULL;
+                atrybutsvalue.firstnode = NULL;
             }
+            
         
         }
-        if (x == '?') {
 
-            cout << "koniec";
-           // Block xx1(&lista);
+        if (x == '?') {
+            cout << "koniec";           
             read = false;
         }
         
