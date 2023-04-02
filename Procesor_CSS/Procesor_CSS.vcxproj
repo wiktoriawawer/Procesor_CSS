@@ -127,7 +127,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Block.cpp" />
+    <ClCompile Include="Element.cpp" />
+    <ClCompile Include="ListElements.cpp" />
+    <ClCompile Include="ListSection.cpp" />
     <ClCompile Include="Procesor_CSS.cpp" />
+    <ClCompile Include="Section.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Block.h" />
+    <ClInclude Include="Element.h" />
+    <ClInclude Include="ListElements.h" />
+    <ClInclude Include="ListSection.h" />
+    <ClInclude Include="Section.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
