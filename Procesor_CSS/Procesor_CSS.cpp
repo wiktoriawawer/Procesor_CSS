@@ -1,6 +1,9 @@
 ﻿
 #include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
+
+
 #define T 8
 using namespace std;
 class Element {
@@ -58,15 +61,17 @@ public:
         element->next = NULL;
 
     }
-    void Find(char* text) {
+    Element* Find(char* text) {
         Element* element = firstnode;
         while (element == NULL) {
             if (element->text == text) {
                 cout << "znaleziono " << text;
+                return element;
             }
             element = element->next;
         }
         cout << " nie znaleziono " << text;
+        return NULL;
     }
     int GetListLen() {
 
@@ -132,6 +137,15 @@ public:
         int i = counter - 1;
         blocks[counter - 1] = block;
     }
+    void Pop(int position) {
+        delete &blocks[position - 1];
+        
+        for (int i = position - 1; i < counter-1; i++) {
+            blocks[i] = blocks[i+1];
+        }
+        counter--;
+        cout << "juz";
+    }
 };
 class ListSection {
 public:
@@ -154,8 +168,7 @@ public:
         }else {
             section->next = new Section(block, section);
         }
-            
-            
+                       
     }
     void Push(Block* block) {
         Section* section = firstnode;
@@ -165,6 +178,28 @@ public:
         section->Push(*block);
 
     }
+   
+    Section* FindSection(int *position) {
+        Section* current = firstnode;
+        int ret = 0;
+        while (current != NULL) {
+            
+            if (ret + current->counter < *position) {
+               
+                ret += current->counter;
+                current = current->next;
+            }
+            else break;          
+        }
+
+        return current;
+    }
+    void Pop(int position) {
+        Section* section(FindSection(&position));
+        section->Pop(position);
+        cout << "usuwanie " << position << "sekcji";
+    }
+
     void Wypisz() {
         Section* current = firstnode;
         int j = 1;
@@ -179,12 +214,199 @@ public:
             j++;
             current = current->next;
         }
-        
-        
+    }
+    int SecionAmount() {
+        Section* current = firstnode;
+        int ret = 0;
+        int j = 1;
+        while (current != NULL) {
+            ret += current->counter;            
+            current = current->next;
+        }
+        return ret;
     }
 };
+bool IsCommand(char* text) {
+    bool komendy = true;
+    for (int j = 0; j < 4; j++) {
+        if (text[j] != '?') komendy = false;
+    }
+    return komendy;
+
+}
+int ConvertToInt(char* text) {
+    int ret = 0;
+    int i = 0;
+    while (true) {
+        if (text[i] == ',') break;
+        if (text[i] == '\n') break;
+        if (text[i] == '\0') break;
+        ret = ret * 10 + ((int)text[i]-(int)'0');
+        i++;
+    }
+    return ret;
+}
+int ReadingNumber(char firstchar) {
+    char text[6];
+    int i = 0;
+    char x = firstchar;
+    if (!isdigit(firstchar)) return -1;
+    while (isdigit(x)) {
+        text[i] = x;
+        i++;
+        x = getchar();
+    }       
+    return  1;//1ConvertToInt(text, i);
+    
+}
+void  CommandSelectors(char* commendPart1, char* commendPart3, ListSection listSection) {
+
+}
+void  CommandAtrybuts(char* commendPart1, char* commendPart3, ListSection listSection) {
+
+}
+
+void  CommandDelete(char* commendPart1, char* commendPart3, ListSection listSection) {
+    int n = ConvertToInt(commendPart1);
+    if (commendPart3[0] == '*') {
+        listSection.Pop(n);
+    }
+    else {
+        //listSection.Pop(n, commendPart3);
+        
+    }
+
+}
+
+void  CommandAtrybutsValue(char* commendPart1, char* commendPart3, ListSection listSection) {
+
+}
+
+
+
+void ReadLine(char text[120]) {
+    char x;
+    int i = 0;
+    while (true) {
+        x = getchar();
+        if (x == '\n' && i != 0)break;
+        if (x == '\n' && i == 0)continue;
+        text[i] = x;
+        i++;
+    }
+    text[i] = '\0';
+    i++;
+    cout << "----";
+    for (int j = 0; j < i; j++) {
+        cout << text[j];
+    }
+    cout << "----";
+}
+
+void ApplyComand(ListSection listSection) {
+    char x;
+    char text[120]; 
+    while (true) {
+        ReadLine(text);
+        if (text[3] == '*') {
+            cout << "koniec komend";
+            break;
+
+        }
+        if (text[0] == '?') {
+            cout << "liczba sekcji CSS";
+            cout << " == " << listSection.SecionAmount();
+            continue;
+        }
+        char commendPart1[40];
+        char commendPart2;
+        char commendPart3[40];
+        int i = 0;
+        for ( i ; i < 120; i++) {
+            
+            if (text[i] == ',') {
+                commendPart1[i] = '\0';
+                break;
+            }
+            commendPart1[i] = text[i];
+        }
+        commendPart2 = text[i + 1];
+        int j = 0;
+        i = i + 3;
+        for (i; i < 120; i++) {
+            if( (text[i] == ',') || (text[i] == '\0') ){
+                commendPart3[j] = '\0';
+                break;
+            }
+            commendPart3[j] = text[i];
+            j++;
+        }
+        //Command(commendPart1, commendPart2, commendPart3); 
+        if (commendPart2 == 'S') {
+            CommandSelectors(commendPart1, commendPart3, listSection);
+        }
+        else  if (commendPart2 == 'D') {
+            CommandDelete(commendPart1, commendPart3, listSection);
+        }
+        else if (commendPart2 == 'E') {
+            CommandAtrybutsValue(commendPart1, commendPart3, listSection);
+        }
+        else if (commendPart2 == 'A') {
+            CommandAtrybuts(commendPart1, commendPart3, listSection);
+
+        }
+        else cout << "Blędna komenda ";
+
+        /*
+         int n;
+        if (isdigit(text[0])) {
+            n = ConvertToInt(text);
+            cout << "liczba:" << n << endl;
+            cout <<"text:"<< text;
+        }
+        else {
+        
+        
+        }
+        char commend;
+        for (i=0;i < 100; i++) {
+            if (text[i] == ',') {
+                commend = text[i+1];
+                break;
+            }           
+        }
+        cout << "komenda:" << commend << endl;
+        int m;
+        if (isdigit(text[i +3])) {
+            m = ConvertToInt(&text[i+3]);
+            cout << "liczba:" << m << endl;
+        }
+        */
+       
+        
+        
+      
+        
+
+    }
+
+}
+
 int main()
-{
+{   
+  
+    char t1[10];
+    for (int i = 0; i < 10; i++) {
+        t1[i] = '0'+i;
+    }
+    cout << t1;
+    char* a = t1;
+    char* b = t1;
+    b = &a[2];
+   // a = &t1[2];
+    cout << a;
+    cout << b;
+
     ListSection listaglowna1;
 
     ListElements atrybuts;
@@ -211,8 +433,17 @@ int main()
             selectors.Write();
             atrybuts.Write();
         }
-        text[i] = x;
+        text[i] = x; 
         i++;
+        if (x == '?' && i == 4) {
+            if (IsCommand(text)) {
+                i = 0;
+                cout << "wczytuje komende";
+                ApplyComand(listaglowna1);
+            }
+            
+        }
+      
         if (readselectors) {
             if (x == ',') {
                 dane = (char*)malloc(sizeof(char) * (i));
@@ -288,7 +519,7 @@ int main()
         
         }
 
-        if (x == '?') {
+        if (x == '!') {
             cout << "koniec";           
             read = false;
         }
