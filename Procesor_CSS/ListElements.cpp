@@ -15,12 +15,24 @@ void ListElements:: Push(char* text) {
     }
     element->next = new Element(text);
 }
+void ListElements::Push(Element* firstnode)
+{
+    Element* current = firstnode;
+    while (current != NULL) {
+        this->Push(current->text);
+        current = current->next;
+    }
+}
 void ListElements:: Pop(char* text) {
     if (firstnode == NULL) return;
     if (firstnode->next == NULL)
         firstnode = NULL;
     Element* element = firstnode;
-    while (element->next->text != text) {
+    if (Compare(firstnode->text, text)) {
+        firstnode = firstnode->next;
+        return;
+    }
+    while (!Compare(element->next->text, text)) {
         element = element->next;
     }
     Element* toDelete = element->next;
@@ -128,6 +140,7 @@ void ListElements:: Write() {
 }
 int ListElements::CountElement(char* name) {
     if (this == NULL)return 0;
+    if (this == nullptr)return 0;
     Element* element = firstnode;
     int count = 0;
     while (element != NULL) {

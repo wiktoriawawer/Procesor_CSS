@@ -11,6 +11,7 @@ public:
     ListElements();
 
     void Push(char* text);
+    void Push(Element* firstnode);
     void Pop(char* text);
     void Pop(int position);
     void Pop();

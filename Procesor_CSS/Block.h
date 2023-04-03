@@ -8,5 +8,6 @@ public:
     Block();
     Block(ListElements a, ListElements b, ListElements c);
     bool IsEmpty();
+    int  FindElement(char* selectorName, char* atrybutName);
     
 };

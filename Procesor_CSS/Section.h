@@ -14,6 +14,8 @@ public:
     void Push(Block block);
     void Pop(int position);
     void Pop(int position, char* atrybut);
+    int CountElement(char* name, char type,ListElements* selectors);
     int CountElement(char* name, char type);
+    int IsInBlock(char* selectorName);
 };
 

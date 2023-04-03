@@ -14,9 +14,12 @@ Section:: Section(Block block) {
 }
 Section::Section(Block block, Section* prev) {
     counter = 1;
-    prev = prev;
-    next = NULL;
+    this->prev = prev;
+    this->next = NULL;
     blocks[counter - 1] = block;
+    
+
+    
 }
 
 void Section::Push(Block block) {
@@ -39,6 +42,8 @@ void Section::Pop(int position,char* atrybut) {
     int atrybutPosition = list->FindPosition(atrybut);
     list->Pop(atrybutPosition);
     valuesList->Pop(atrybutPosition);
+    if (list->firstnode == NULL)
+        this->Pop(position);
 
     //cout << "--juz+-";
 }
@@ -46,14 +51,54 @@ int Section::CountElement(char* name, char type) {
     int count=0;
     for (int i = 0; i < counter; i++) {
         if (type == 'A') {
-            count+=blocks[i].atrybuts->CountElement(name);
+            int n = blocks[i].atrybuts->CountElement(name);
+            if (n > 0) {
+                //sprawdzic czy wystepuje juz w selectors dodac lub nie ale chyba ten push sie nie przyda 
+                //selectors->Push(blocks[i].selectors->firstnode);
+            }
+            count+=n;
         }
         else if (type == 'S') {
             count += blocks[i].selectors->CountElement(name);
         }         
     }
     return count;
-    
+}
+int Section::CountElement(char* name, char type, ListElements* selectors) {
+    int count = 0;
+    for (int i = 0; i < counter; i++) {
+        if (type == 'A') {
+            int n = blocks[i].atrybuts->CountElement(name);
+            if (n > 0) {
+                //sprawdzic czy wystepuje juz w selectors dodac lub nie ale chyba ten push sie nie przyda 
+                Element* current = blocks[i].selectors->firstnode;
+                while (current!=NULL) {
+                    int positionselector = selectors->FindPosition(current->text);
+                    if (positionselector != -1) {
+                        n--;
+                    }
+                    else {
+                        selectors->Push(current->text);
+                    }
+                    current = current->next; 
+                }
+                count++;
+            }
 
+        }
+        else if (type == 'S') {
+            count += blocks[i].selectors->CountElement(name);
+        }
+    }
+    return count;
+}
+
+//return last number of blocks if it is Section else -1 
+int Section::IsInBlock(char* selectorName) {
+    for (int i = counter-1; i >=0; i--) {
+        if (blocks[i].selectors->CountElement(selectorName) > 0)
+            return i;
+    }
+    return -1;
 }
 

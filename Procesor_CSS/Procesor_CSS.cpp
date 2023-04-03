@@ -56,19 +56,20 @@ void  CommandDelete(char* commendPart1, char* commendPart3, ListSection listSect
 
 void  CommandAmountOf(char* commendPart1, char commendPart2, ListSection listSection) {
     int n;
+    int commendNumber;
     if (isdigit(commendPart1[0])) {
         n = ConvertToInt(commendPart1);
+        commendNumber = n;
         Section* section(listSection.FindSection(&n));
         if (section == NULL)return  ;
-
         if (commendPart2 == 'A') {
-            cout << n << ",A,? ";
+            cout << commendNumber << ",A,? ";
             cout << "== "<<section->blocks[n - 1].atrybuts->GetListLen() << endl;
             return;
         }
             
         if (commendPart2 == 'S') {
-            cout << n << ",S,? ";
+            cout << commendNumber << ",S,? ";
             cout << "== " << section->blocks[n - 1].selectors->GetListLen() << endl;
             return;
         }
@@ -76,9 +77,12 @@ void  CommandAmountOf(char* commendPart1, char commendPart2, ListSection listSec
     }
     else {
         Section* current = listSection.firstnode;
+        ListElements* selectors=new ListElements();
         int count = 0;
         while (current != NULL) {
-            count += current->CountElement(commendPart1, commendPart2);
+            int n = current->CountElement(commendPart1, commendPart2, selectors);
+
+            count += n;
             current = current->next;
         }
         cout << commendPart1 << "," << commendPart2 << ",? ";
@@ -110,7 +114,20 @@ void Command(char* commendPart1, char commendPart2, char* commendPart3, ListSect
          return;
     }
     if (commendPart2 == 'E') {
-        //obsługa E
+        Section* current = listSection.lastnode;
+        int position = -1;
+        while (current != NULL) {
+            position = current->IsInBlock(commendPart1);
+            if (position != -1) {
+                int atrybutsPosition=current->blocks[position].atrybuts->FindPosition(commendPart3);
+                if (atrybutsPosition != -1) {
+                    cout << commendPart1 << ",E," << commendPart3 << " == ";
+                    cout << current->blocks[position].atrybutsvalue->GetElement(atrybutsPosition)->text << endl;
+                    return;
+                }                
+            }            
+            current = current->prev;
+        }
         return;
     }
     int n = ConvertToInt(commendPart1);
@@ -153,9 +170,12 @@ bool ApplyComand(ListSection listSection) {
         if (text[10] == '\xFF') {
             cout << "tu";
         }
-        if (text[0] == '?') {
+        if (text[0] == '?'&& text[1]=='\0') {
             if (listSection.firstnode == NULL) cout << " == 0";
             cout << "? == " << listSection.SecionAmount() << endl;
+            continue;
+        }
+        if (text[3] == '?' && text[0] == '?') {
             continue;
         }
         
@@ -232,7 +252,9 @@ int main()
                     dane[j] = text[j];
                 }
                 dane[i - 1] = '\0';
-                selectors.Push(dane);
+                if (selectors.FindPosition(dane) == -1) {
+                    selectors.Push(dane);
+                }
                 i = 0;            
             }if (x == '{') {
                 if (text[i - 2] == ' ') i-- ;
@@ -241,7 +263,9 @@ int main()
                     dane[j] = text[j];
                 }
                 dane[i - 1] = '\0';
-                selectors.Push(dane);
+                if (selectors.FindPosition(dane) == -1) {
+                    selectors.Push(dane);
+                }
                 i = 0;
                 readselectors = false;
                 readatributs = true;
@@ -256,6 +280,10 @@ int main()
                 dane[j] = text[j];
             }
             dane[i - 1] = '\0';
+            if (atrybuts.FindPosition(dane) != -1) {
+                atrybuts.Pop(dane);
+                atrybutsvalue.Pop(atrybuts.FindPosition(dane));
+            }
             atrybuts.Push(dane);
             i = 0;
             readartibutsvalue = true;

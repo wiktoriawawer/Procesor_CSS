@@ -21,7 +21,7 @@ void ListSection::Push(Block block) {
     }
     else {
         section->next = new Section(block, section);
-        lastnode = section->next;
+        lastnode = section;
     }
 
 }
