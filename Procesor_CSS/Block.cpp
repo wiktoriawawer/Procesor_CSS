@@ -2,31 +2,14 @@
 
 Block:: Block() {
         selectors = NULL;
+        atrybuts = NULL;
+        atrybutsvalue = NULL;
     }
-Block::Block(ListElements a, ListElements b, ListElements c) {
-        selectors = new ListElements(a);
-        atrybuts = new ListElements(b);
-        atrybutsvalue = new ListElements(c);
+Block::Block(ListElements sel, ListElements atry, ListElements value) {
+        selectors = new ListElements(sel);
+        atrybuts = new ListElements(atry);
+        atrybutsvalue = new ListElements(value);
 }
-bool Block::IsEmpty() {
-    if (atrybuts->firstnode == NULL) {
-        //cout << "lista pusta";
-        return true;
-    }
-    else return false;
-}
-int  Block::FindElement (char* selectorName,char* atrybutName) {
-    Element* current = this->selectors->firstnode;
-    while (current != NULL) {
-        if (Compare(current->text, selectorName)) {
 
-        }
-    }
-    if (atrybuts->firstnode == NULL) {
-        //cout << "lista pusta";
-        return true;
-    }
-    else return false;
-}
 
 

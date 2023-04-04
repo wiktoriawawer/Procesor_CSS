@@ -8,6 +8,8 @@ using namespace std;
 
 #define T 8
 
+void ReadLine(char text[120]);
+
 bool IsCommand(char* text) {
     bool komendy = true;
     for (int j = 0; j < 4; j++) {
@@ -15,6 +17,7 @@ bool IsCommand(char* text) {
     }
     return komendy;
 }
+
 int ConvertToInt(char* text) {
     int ret = 0;
     int i = 0;
@@ -22,53 +25,50 @@ int ConvertToInt(char* text) {
         if (text[i] == ',') break;
         if (text[i] == '\n') break;
         if (text[i] == '\0') break;
+        if (text[i] < ' ' || text[i] > '~')continue;
         ret = ret * 10 + ((int)text[i]-(int)'0');
         i++;
     }
     return ret;
 }
-int ReadingNumber(char firstchar) {
-    char text[6];
-    int i = 0;
-    char x = firstchar;
-    if (!isdigit(firstchar)) return -1;
-    while (isdigit(x)) {
-        text[i] = x;
-        i++;
-        x = getchar();
-    }
-    return  1;//1ConvertToInt(text, i);
-}
 
-void  CommandDelete(char* commendPart1, char* commendPart3, ListSection listSection) {
-    if (listSection.firstnode == NULL) return;
+
+void  CommandDelete(char* commendPart1, char* commendPart3, ListSection* listSection) {
+    if (listSection->firstnode == NULL) return;
     int n = ConvertToInt(commendPart1);
     if (commendPart3[0] == '*') {
-        listSection.Pop(n);
-        cout << n << ",D,*";
+        if (n <= listSection->SecionAmount()) {
+            listSection->Pop(n);
+            cout << n << ",D,*";
+            cout << " == deleted" << endl;
+        }
     }
     else {     
-        listSection.Pop(n, commendPart3); 
-        cout << n << ",D," << commendPart3;
+        if (n <= listSection->SecionAmount()) {
+            if (listSection->ElementExist(n, commendPart3)) {
+                listSection->Pop(n, commendPart3);
+                cout << n << ",D," << commendPart3;
+                cout << " == deleted" << endl;
+            }
+            
+        }
     }
-    cout << " == deleted" << endl;
 }
 
-void  CommandAmountOf(char* commendPart1, char commendPart2, ListSection listSection) {
+void  CommandAmountOf(char* commendPart1, char commendPart2, ListSection* listSection) {
     int n;
     int commendNumber;
     if (isdigit(commendPart1[0])) {
         n = ConvertToInt(commendPart1);
         commendNumber = n;
-        Section* section(listSection.FindSection(&n));
-        if (section == NULL)return  ;
+        Section* section(listSection->FindSection(&n));
+        if (section == NULL) return;
         if (commendPart2 == 'A') {
             cout << commendNumber << ",A,? ";
             cout << "== "<<section->blocks[n - 1].atrybuts->GetListLen() << endl;
             return;
-        }
-            
-        if (commendPart2 == 'S') {
+        }            
+        else if (commendPart2 == 'S') {
             cout << commendNumber << ",S,? ";
             cout << "== " << section->blocks[n - 1].selectors->GetListLen() << endl;
             return;
@@ -76,7 +76,7 @@ void  CommandAmountOf(char* commendPart1, char commendPart2, ListSection listSec
             
     }
     else {
-        Section* current = listSection.firstnode;
+        Section* current = listSection->firstnode;
         ListElements* selectors=new ListElements();
         int count = 0;
         while (current != NULL) {
@@ -89,22 +89,24 @@ void  CommandAmountOf(char* commendPart1, char commendPart2, ListSection listSec
         cout << "== " << count << endl;
     }
 }
-void CommandAtrybutsValue(int n, char* name, ListSection listSection) {
-    Section* section(listSection.FindSection(&n));
+void CommandAtrybutsValue(int position, char* name, ListSection* listSection) {
+    int n = position;
+    Section* section(listSection->FindSection(&n));
     int m = section->blocks[n - 1].atrybuts->FindPosition(name);
     if (m == -1) return;
-    cout << n << ",A," << name;
+    cout << position << ",A," << name;
     cout << " == ";
     cout << section->blocks[n - 1].atrybutsvalue->GetElement(m)->text << endl;
 }
-void CommandSelector(int n,int j, ListSection listSection) {   
-    Section* section(listSection.FindSection(&n));
+void CommandSelector(int position,int j, ListSection* listSection) {
+    int n = position;
+    Section* section(listSection->FindSection(&n));
     if (section == NULL)return;
     if (section->blocks[n - 1].selectors->GetElement(j) == nullptr) return;
-    cout << n << ",S," << j;
+    cout << position << ",S," << j;
     cout <<" == " <<section->blocks[n - 1].selectors->GetElement(j)->text << endl;
 }
-void Command(char* commendPart1, char commendPart2, char* commendPart3, ListSection listSection) {
+void Command(char* commendPart1, char commendPart2, char* commendPart3, ListSection *listSection) {
     if (commendPart3[0] == '?') {
          CommandAmountOf(commendPart1,commendPart2,listSection );
          return;
@@ -114,7 +116,7 @@ void Command(char* commendPart1, char commendPart2, char* commendPart3, ListSect
          return;
     }
     if (commendPart2 == 'E') {
-        Section* current = listSection.lastnode;
+        Section* current = listSection->lastnode;
         int position = -1;
         while (current != NULL) {
             position = current->IsInBlock(commendPart1);
@@ -130,6 +132,7 @@ void Command(char* commendPart1, char commendPart2, char* commendPart3, ListSect
         }
         return;
     }
+    if (!isdigit(commendPart1[0]))return; 
     int n = ConvertToInt(commendPart1);
     if (commendPart2 == 'A') {
          CommandAtrybutsValue(n, commendPart3,listSection);
@@ -147,7 +150,16 @@ void ReadLine(char text[120]) {
     int i = 0;
     while ((x = getchar())!=EOF) {
         if (x == '\n' && i != 0)break;
-        if (x == '\n' && i == 0)continue;
+        if (x == '\n' && i == 0) {
+            text[0] = '@';
+            i++;
+            break;
+        }
+        if (x == '\t')continue;
+        if (x == '\v')continue;
+        if (x == '\f')continue;
+        if (x == '\r')continue;
+        if (x < ' ' || x > '~')continue;
         text[i] = x;
         i++;
     }
@@ -155,24 +167,23 @@ void ReadLine(char text[120]) {
     i++;
 }
 
-bool ApplyComand(ListSection listSection) {
+bool ApplyComand(ListSection* listSection) {
     char x;
     char text[120]; 
     while (true) {
         ReadLine(text);
-        if (text[0] == '\0')return false;
+        if (text[0] == '*') break;
+        if (text[0] == '@') continue;
+        if (text[0] == '\0') return false;
         if (text[3] == '*') {
             break;
         }
-        if (text[10] == '\xff') {
-            cout << "tu";
-        }
-        if (text[10] == '\xFF') {
-            cout << "tu";
-        }
         if (text[0] == '?'&& text[1]=='\0') {
-            if (listSection.firstnode == NULL) cout << " == 0";
-            cout << "? == " << listSection.SecionAmount() << endl;
+            if (listSection->firstnode == NULL) {
+                cout << "? == 0" << endl;
+                continue;
+            }
+            cout << "? == " << listSection->SecionAmount() << endl;
             continue;
         }
         if (text[3] == '?' && text[0] == '?') {
@@ -202,13 +213,10 @@ bool ApplyComand(ListSection listSection) {
             j++;
         }
         if (i > 120)break;
-        //spr czy text poprawny ? 
-        //cout << text << " ";
-        Command(commendPart1, commendPart2, commendPart3,listSection); 
+        Command(commendPart1, commendPart2, commendPart3, listSection); 
     }
     return true;
 }
-
 
 int main()
 {   
@@ -227,9 +235,13 @@ int main()
     int i = 0;
 
     while ((x = getchar()) != EOF) {
+        
         if (i == 0 && x == ' ')continue;
-
-        if (x == '\n' || x=='\t') continue;     
+        if (x == '\n' || x=='\t') continue;  
+        if (x == '\v') continue;
+        if (x == '\f') continue;
+        if (x == '\r') continue;
+        if (x < ' ' || x > '~')continue;
         if (x == '@') {
             listaglowna1.Wypisz();
             selectors.Write();
@@ -238,10 +250,10 @@ int main()
         }
         text[i] = x; 
         i++;
-        if (x == '?' && i == 4) {
-            if (IsCommand(text)) {
+        if (x == '?' && i >= 4) {
+            if (text[i - 2] == '?' && text[i - 3] == '?' && text[i - 4] == '?') {
+                ApplyComand(&listaglowna1);
                 i = 0;
-                if(!ApplyComand(listaglowna1)) break;
             }
         }
         if (readselectors) {
@@ -280,9 +292,10 @@ int main()
                 dane[j] = text[j];
             }
             dane[i - 1] = '\0';
-            if (atrybuts.FindPosition(dane) != -1) {
+            int positionOfDane = atrybuts.FindPosition(dane);
+            if (positionOfDane != -1) {
                 atrybuts.Pop(dane);
-                atrybutsvalue.Pop(atrybuts.FindPosition(dane));
+                atrybutsvalue.Pop(atrybutsvalue.GetElement(positionOfDane)->text);
             }
             atrybuts.Push(dane);
             i = 0;

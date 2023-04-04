@@ -24,7 +24,6 @@ Section::Section(Block block, Section* prev) {
 
 void Section::Push(Block block) {
     counter++;
-    int i = counter - 1;
     blocks[counter - 1] = block;
 }
 void Section::Pop(int position) {
@@ -44,8 +43,6 @@ void Section::Pop(int position,char* atrybut) {
     valuesList->Pop(atrybutPosition);
     if (list->firstnode == NULL)
         this->Pop(position);
-
-    //cout << "--juz+-";
 }
 int Section::CountElement(char* name, char type) {
     int count=0;
@@ -70,14 +67,10 @@ int Section::CountElement(char* name, char type, ListElements* selectors) {
         if (type == 'A') {
             int n = blocks[i].atrybuts->CountElement(name);
             if (n > 0) {
-                //sprawdzic czy wystepuje juz w selectors dodac lub nie ale chyba ten push sie nie przyda 
                 Element* current = blocks[i].selectors->firstnode;
                 while (current!=NULL) {
                     int positionselector = selectors->FindPosition(current->text);
-                    if (positionselector != -1) {
-                        n--;
-                    }
-                    else {
+                    if (positionselector == -1) {
                         selectors->Push(current->text);
                     }
                     current = current->next; 

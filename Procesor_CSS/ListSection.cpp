@@ -21,7 +21,8 @@ void ListSection::Push(Block block) {
     }
     else {
         section->next = new Section(block, section);
-        lastnode = section;
+        lastnode = section->next;
+        lastnode->prev = section;
     }
 
 }
@@ -50,43 +51,23 @@ void ListSection::Pop(int position) {
         free(section);
         return;
     }
-    section->Pop(position);
+    else
+        section->Pop(position);
     
 }
 void ListSection::Pop(int position,char* atrybut) {
-    Section* section(FindSection(&position));
-    /*
-    if (section->counter == 1) {
-        if (this->firstnode == section)
-            this->firstnode = section->next;
-        if (section->prev != NULL)
-            section->prev->next = section->next;
-        if (section->next != NULL)
-            section->next->prev = section->prev;
-        free(section);
-        return;
-    }
-    */
-        
+    Section* section(FindSection(&position));        
     section->Pop(position,atrybut);
-    //cout << "usuwanie " << position << "atrybutu ";
+
+}
+bool  ListSection:: ElementExist(int n, char* commendPart3) {
+    int a = n;
+    Section* section(FindSection(&a));
+    ListElements* list = section->blocks[a- 1].atrybuts;
+    if (list->FindPosition(commendPart3) != -1)return true;
+    else return false;
 }
 
-void ListSection::TestWypisz() {
-    Section* current = firstnode;
-    int j = 1;
-    while (current != NULL) {
-        cout << "    " << j << " wezel" << endl;
-        for (int i = 0; i < current->counter; i++) {
-            cout << "   " << i + 1 << " blok" << endl;
-            //current->blocks[i].selectors->Write();
-            //current->blocks[i].atrybuts->Write();
-            //current->blocks[i].atrybutsvalue->Write();
-        }
-        j++;
-        current = current->next;
-    }
-}
 void ListSection::Wypisz() {
     Section* current = firstnode;
     int j = 1;
@@ -112,9 +93,5 @@ int ListSection::SecionAmount() {
         current = current->next;
     }
     return ret;
-}
-Block* ListSection::BlockPosition(int position) {
-    Section* section(FindSection(&position));
-    return &(section->blocks[position]);
 }
 

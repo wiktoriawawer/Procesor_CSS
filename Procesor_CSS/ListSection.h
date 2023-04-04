@@ -11,7 +11,8 @@ public:
     void Pop(int position, char* atrybut);
     void TestWypisz();
     void Wypisz();
+    bool  ElementExist(int n, char* commendPart3);
  
     int SecionAmount();
-    Block* BlockPosition(int position);
+    
 };

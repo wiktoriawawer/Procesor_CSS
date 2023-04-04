@@ -15,12 +15,11 @@ public:
     void Pop(char* text);
     void Pop(int position);
     void Pop();
-    Element* Find(char* text);
+    //Funkcja zwraca pozycje elementu w liscie zaczynaj¹c od 1 - w przypadku braku zwaraca -1 
     int  FindPosition(char* text);
-    int GetListLen();
-    Element* GetElement(int position);
+    int GetListLen(); //zwraca dlugosc listy 
+    Element* GetElement(int position); //zwraca wskaznik na element o podanje pozycjii 
     void Write();
-    int CountElement(char* name);
-
+    int CountElement(char* name); //Zwraca iloœc elementow w liscie o danej nazwie 
 };
 bool Compare(char* text1, char* text2);

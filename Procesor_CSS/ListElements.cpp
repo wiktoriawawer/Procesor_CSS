@@ -75,25 +75,13 @@ void ListElements:: Pop() {
     element->next = NULL;
 
 }
-Element* ListElements::Find(char* text) {
-    Element* element = firstnode;
-    while (element != NULL) {
-        if (element->text == text) {
-            //cout << "znaleziono " << text;
-            return element;
-        }
-        element = element->next;
-    }
-    //cout << " nie znaleziono " << text;
-    return NULL;
-}
+
 int ListElements::FindPosition(char* text) {
     Element* element = firstnode;
     int position = 1;
     while (element != NULL) {
         if (Compare(element->text,text)) {
-            //cout << position;
-            //cout << "    znaleziono ";
+
             return position;
         }
         element = element->next;
@@ -123,7 +111,6 @@ Element* ListElements:: GetElement(int position) {
         element = element->next;
         currentPosition++;
     }
-    //cout << " nie znaleziono ";
     return NULL;
 }
 
