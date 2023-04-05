@@ -5,11 +5,12 @@
 #include "ListElements.h"
 #include "ListSection.h"
 using namespace std;
-
 #define T 8
+bool ReadLine(char text[120]);
+int ilosccss=1;
+int ilosckomend=0;
 
-void ReadLine(char text[120]);
-
+bool debug = false;
 bool IsCommand(char* text) {
     bool komendy = true;
     for (int j = 0; j < 4; j++) {
@@ -125,6 +126,7 @@ void Command(char* commendPart1, char commendPart2, char* commendPart3, ListSect
                 if (atrybutsPosition != -1) {
                     cout << commendPart1 << ",E," << commendPart3 << " == ";
                     cout << current->blocks[position].atrybutsvalue->GetElement(atrybutsPosition)->text << endl;
+                    debug = true;
                     return;
                 }                
             }            
@@ -145,7 +147,7 @@ void Command(char* commendPart1, char commendPart2, char* commendPart3, ListSect
     }
 }
 
-void ReadLine(char text[120]) {
+bool ReadLine(char text[120]) {
     char x;
     int i = 0;
     while ((x = getchar())!=EOF) {
@@ -163,18 +165,23 @@ void ReadLine(char text[120]) {
         text[i] = x;
         i++;
     }
+    if (x == EOF) return false;
     text[i] = '\0';
     i++;
+    return true;
 }
 
 bool ApplyComand(ListSection* listSection) {
     char x;
     char text[120]; 
     while (true) {
-        ReadLine(text);
-        if (text[0] == '*') break;
+        if (!ReadLine(text)) return false;
+        if (text[0] == '*') {
+            ilosccss++;
+            break;
+        }
         if (text[0] == '@') continue;
-        if (text[0] == '\0') return false;
+        if (text[0] == '\0') continue;
         if (text[3] == '*') {
             break;
         }
@@ -233,7 +240,6 @@ int main()
     dane = NULL;
     char text[120000];
     int i = 0;
-
     while ((x = getchar()) != EOF) {
         
         if (i == 0 && x == ' ')continue;
@@ -243,6 +249,7 @@ int main()
         if (x == '\r') continue;
         if (x < ' ' || x > '~')continue;
         if (x == '@') {
+            //break;
             listaglowna1.Wypisz();
             selectors.Write();
             atrybuts.Write();
@@ -252,8 +259,10 @@ int main()
         i++;
         if (x == '?' && i >= 4) {
             if (text[i - 2] == '?' && text[i - 3] == '?' && text[i - 4] == '?') {
+                ilosckomend++;
                 ApplyComand(&listaglowna1);
                 i = 0;
+                continue;
             }
         }
         if (readselectors) {
@@ -338,7 +347,8 @@ int main()
                 atrybutsvalue.firstnode = NULL;
             }
         }        
-    }    
+    } 
+    //cout << ilosccss << "," << ilosckomend;
 
 }
 
