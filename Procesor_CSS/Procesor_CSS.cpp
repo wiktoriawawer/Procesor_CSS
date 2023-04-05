@@ -128,6 +128,7 @@ void Command(char* commendPart1, char commendPart2, char* commendPart3, ListSect
                     cout << current->blocks[position].atrybutsvalue->GetElement(atrybutsPosition)->text << endl;
                     debug = true;
                     return;
+
                 }                
             }            
             current = current->prev;
@@ -151,11 +152,17 @@ bool ReadLine(char text[120]) {
     char x;
     int i = 0;
     while ((x = getchar())!=EOF) {
-        if (x == '\n' && i != 0)break;
+        if (x == '\n' && i != 0) {
+            break;
+        }            
         if (x == '\n' && i == 0) {
             text[0] = '@';
             i++;
             break;
+        }
+        if (x == '\t') {
+            cout << "(";
+            continue;
         }
         if (x == '\t')continue;
         if (x == '\v')continue;
@@ -165,7 +172,7 @@ bool ReadLine(char text[120]) {
         text[i] = x;
         i++;
     }
-    if (x == EOF) return false;
+    if (x == EOF) return false; //tu
     text[i] = '\0';
     i++;
     return true;
@@ -175,16 +182,18 @@ bool ApplyComand(ListSection* listSection) {
     char x;
     char text[120]; 
     while (true) {
-        if (!ReadLine(text)) return false;
+        if (!ReadLine(text)) return false;//tuu !!!!!!!!!!
         if (text[0] == '*') {
-            ilosccss++;
+          //  if(debug)
+                //cout<<"*";
             break;
         }
         if (text[0] == '@') continue;
-        if (text[0] == '\0') continue;
+        //if (text[0] == '\0') continue;
         if (text[3] == '*') {
             break;
         }
+
         if (text[0] == '?'&& text[1]=='\0') {
             if (listSection->firstnode == NULL) {
                 cout << "? == 0" << endl;
@@ -238,12 +247,19 @@ int main()
     char x;
     char* dane;
     dane = NULL;
-    char text[120000];
+    char text[1200];
     int i = 0;
     while ((x = getchar()) != EOF) {
         
+        //if (i==0 && isspace(x)) continue;//nowe
+        
         if (i == 0 && x == ' ')continue;
-        if (x == '\n' || x=='\t') continue;  
+        if (x == '\n') continue;
+        if (x == '\t') {
+            //cout << "(";
+            continue;
+        }
+             
         if (x == '\v') continue;
         if (x == '\f') continue;
         if (x == '\r') continue;
@@ -260,8 +276,12 @@ int main()
         if (x == '?' && i >= 4) {
             if (text[i - 2] == '?' && text[i - 3] == '?' && text[i - 4] == '?') {
                 ilosckomend++;
+                if(debug)cout << "";
                 ApplyComand(&listaglowna1);
                 i = 0;
+                readselectors = true;
+                readartibutsvalue = false;
+                readatributs = false;
                 continue;
             }
         }
