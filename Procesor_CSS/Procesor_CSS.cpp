@@ -102,8 +102,15 @@ void CommandAtrybutsValue(int position, char* name, ListSection* listSection) {
 void CommandSelector(int position,int j, ListSection* listSection) {
     int n = position;
     Section* section(listSection->FindSection(&n));
-    if (section == NULL)return;
-    if (section->blocks[n - 1].selectors->GetElement(j) == nullptr) return;
+    if (section == NULL)
+        return;
+
+    if (section->blocks[n - 1].selectors->GetElement(j) == nullptr) 
+        return;
+
+    if (j > section->blocks[n - 1].selectors->GetListLen())
+        return;
+
     cout << position << ",S," << j;
     cout <<" == " <<section->blocks[n - 1].selectors->GetElement(j)->text << endl;
 }
@@ -172,7 +179,7 @@ bool ReadLine(char text[120]) {
         text[i] = x;
         i++;
     }
-    if (x == EOF) return false; //tu
+    if (i==0 && x == EOF) return false; //tu
     text[i] = '\0';
     i++;
     return true;
@@ -184,16 +191,12 @@ bool ApplyComand(ListSection* listSection) {
     while (true) {
         if (!ReadLine(text)) return false;//tuu !!!!!!!!!!
         if (text[0] == '*') {
-          //  if(debug)
-                //cout<<"*";
             break;
         }
         if (text[0] == '@') continue;
-        //if (text[0] == '\0') continue;
         if (text[3] == '*') {
             break;
         }
-
         if (text[0] == '?'&& text[1]=='\0') {
             if (listSection->firstnode == NULL) {
                 cout << "? == 0" << endl;

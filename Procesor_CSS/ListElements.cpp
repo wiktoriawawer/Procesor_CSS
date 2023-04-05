@@ -95,8 +95,9 @@ int ListElements::GetListLen() {
     Element* element = firstnode;
     int currentPosition = 0;
     while (element != NULL) {
+        if (element->text[0] != '\0')
+            currentPosition++;
         element = element->next;
-        currentPosition++;
     }    
     return currentPosition;
 }
