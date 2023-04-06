@@ -23,6 +23,7 @@ void ListElements::Push(Element* firstnode)
         current = current->next;
     }
 }
+// usuniecie elementu z podana wartoscia 
 void ListElements:: Pop(char* text) {
     if (firstnode == NULL) return;
     if (firstnode->next == NULL)
@@ -39,26 +40,24 @@ void ListElements:: Pop(char* text) {
     element->next = element->next->next;
     delete(toDelete);
 }
+//usuniecie elementu z podanej pozycji 
 void ListElements::Pop(int position) {
-    //Element* element = GetElement(position);
-    //this->Pop(element->text);
-    if (firstnode == NULL) return;
+
+    if (firstnode == NULL)
+        return;
     if (firstnode->next == NULL)
         firstnode = NULL;
     Element* element = firstnode;
-    //if (element == nullptr) return;
+
     int currentPosition = 1;
     while (element != NULL) {
         if (currentPosition == position) {
-            //cout << "znaleziono ";
             this->Pop(element->text);
             return;
         }
         element = element->next;
         currentPosition++;
     }
-    //cout << " nie znaleziono ";
-  
 
 }
 
@@ -75,19 +74,17 @@ void ListElements:: Pop() {
     element->next = NULL;
 
 }
-
+//szuka numeru pozycji elementu z podnym tekstem  
 int ListElements::FindPosition(char* text) {
     Element* element = firstnode;
     int position = 1;
     while (element != NULL) {
         if (Compare(element->text,text)) {
-
             return position;
         }
         element = element->next;
         position++;
     }
-    //cout << " nie znaleziono ";
     return -1;
 }
 int ListElements::GetListLen() {
@@ -95,18 +92,23 @@ int ListElements::GetListLen() {
     Element* element = firstnode;
     int currentPosition = 0;
     while (element != NULL) {
+
+        if (element->text == NULL) 
+            break;
+
         if (element->text[0] != '\0')
             currentPosition++;
+
         element = element->next;
     }    
     return currentPosition;
 }
+//zwraca wskaznik na element od podanej pozycji 
 Element* ListElements:: GetElement(int position) {
     Element* element = firstnode;
     int currentPosition = 1;
     while (element != NULL) {
         if (currentPosition == position) {
-            //cout << "znaleziono ";
             return element;
         }
         element = element->next;
@@ -115,23 +117,15 @@ Element* ListElements:: GetElement(int position) {
     return NULL;
 }
 
-void ListElements:: Write() {
-    int i = 1;
-    if (firstnode == nullptr) return;
-    Element* element = firstnode;
-    while (element != NULL) {
-        cout << "  " << i << " -|" << element->text<<"|";
-        i++;
-        element = element->next;
-    }
-    cout << endl;
-}
+
 int ListElements::CountElement(char* name) {
     if (this == NULL)return 0;
     if (this == nullptr)return 0;
     Element* element = firstnode;
     int count = 0;
+    //iteracja po elementach
     while (element != NULL) {
+        //zliczanie jezeli text jest taki sam 
         if (Compare(element->text, name)) {
             count++;
         }
@@ -139,10 +133,13 @@ int ListElements::CountElement(char* name) {
     }
     return count;
 }
+
 bool Compare(char* text1, char* text2) {
-    int n = 1000000;
+    int n = MAXLEN;
+    if (text1 == NULL) return false;
+    if (text2 == NULL) return false;
     for (int i = 0; i < n; i++) {
-        if (text1[i] == '\0' && text2[i] == '\0')return true;
+        if (text1[i] == '\0' && text2[i] == '\0') return true;
         if (text1[i] != text2[i])return false;
     }
     return false;
